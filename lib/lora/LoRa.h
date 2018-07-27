@@ -47,6 +47,14 @@ public:
   void idle();
   void sleep();
 
+  int getFrequency();
+  int getTxPower();
+  int getSpreadingFactor();
+  long getSignalBandwidth();
+  int getCodingRate4();
+  long getPreambleLength();
+  int getSyncWord();
+
   void setTxPower(int level, int outputPin = PA_OUTPUT_PA_BOOST_PIN);
   void setFrequency(long frequency);
   void setSpreadingFactor(int sf);

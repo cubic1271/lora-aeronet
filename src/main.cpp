@@ -3,6 +3,8 @@
 
 #include <SPI.h>
 #include <LoRa.h>
+#include "stats.h"
+#include "display.h"
 // #include "SSD1306.h"
 
 SSD1306 display(0x3c, 4, 15);
@@ -11,10 +13,6 @@ SSD1306 display(0x3c, 4, 15);
 //OLED_SDA — GPIO4
 //OLED_SCL — GPIO15
 //OLED_RST — GPIO16
-
-#define REG_FRF_MSB              0x06
-#define REG_FRF_MID              0x07
-#define REG_FRF_LSB              0x08
 
 // WIFI_LoRa_32 ports
 
@@ -47,8 +45,6 @@ int ctr = 0;
 char sbuf[512];
 
 void setup() {
-  uint64_t freq_res;
-  uint8_t tmp_freq;
   pinMode(16,OUTPUT);
   digitalWrite(16, LOW); // set GPIO16 low to reset OLED
   delay(50);
@@ -63,7 +59,6 @@ void setup() {
   while (!Serial); //if just the the basic function, must connect to a computer
   delay(1000);
 
-  Serial.println("LoRa Receiver");
   display.drawString(5,5,"LoRa Receiver");
   display.display();
   SPI.begin(5,19,27,18);
@@ -97,20 +92,9 @@ void setup() {
   display.drawString(5,25,"Startup completed ...");
   display.display();
 
-  freq_res = 0;
-  tmp_freq = LoRa.readRegister(REG_FRF_MSB);
-  freq_res |= (tmp_freq << 16);
-  tmp_freq = LoRa.readRegister(REG_FRF_MID);
-  freq_res |= (tmp_freq << 8);
-  tmp_freq = LoRa.readRegister(REG_FRF_LSB);
-  freq_res |= tmp_freq;
-
-  freq_res = freq_res * 32000000;
-  freq_res = freq_res >> 19;
-
   display.clear();
   display.setFont(ArialMT_Plain_10);
-  snprintf(sbuf, 512, "Frequency: %u MHz", (uint32_t) freq_res / 1000000);
+  snprintf(sbuf, 512, "Frequency: %u MHz", LoRa.getFrequency() / 1000000);
   display.drawString(5, 0, sbuf);
   display.display();
 }
@@ -119,24 +103,11 @@ void loop() {
   display.clear();
   display.drawString(5,25,"Sending packet ...");
 
-  uint8_t tmp_freq = 0;
-  uint64_t freq_res = 0;
-
-  tmp_freq = LoRa.readRegister(REG_FRF_MSB);
-  freq_res |= (tmp_freq << 16);
-  tmp_freq = LoRa.readRegister(REG_FRF_MID);
-  freq_res |= (tmp_freq << 8);
-  tmp_freq = LoRa.readRegister(REG_FRF_LSB);
-  freq_res |= tmp_freq;
-
-  freq_res = freq_res * 32000000;
-  freq_res = freq_res >> 19;
-
   // try to parse packet
   int packetSize = LoRa.parsePacket();
   if (packetSize) {
     display.clear();
-    snprintf(sbuf, 512, "Frequency: %u MHz", (uint32_t) freq_res / 1000000);
+    snprintf(sbuf, 512, "Frequency: %u MHz", LoRa.getFrequency() / 1000000);
     display.drawString(5, 0, sbuf);
     display.display();
 
