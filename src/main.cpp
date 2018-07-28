@@ -38,31 +38,20 @@ SSD1306 display(0x3c, 4, 15);
 #define codingRateDenominator 8
 
 // ADC? Battery voltage
-// const uint8_t vbatPin = 34;
-// float VBAT;  // battery voltage from ESP32 ADC read
+const uint8_t vbatPin = 34;
+float VBAT;  // battery voltage from ESP32 ADC read
 
 int ctr = 0;
 char sbuf[512];
 
 void setup() {
-  pinMode(16,OUTPUT);
-  digitalWrite(16, LOW); // set GPIO16 low to reset OLED
-  delay(50);
-  digitalWrite(16, HIGH);
+    aeronet_display_init(&display);
+    Serial.begin(115200);
+    while (!Serial);
+    delay(1000);
 
-  display.init();
-  display.flipScreenVertically();
-  display.setFont(ArialMT_Plain_10);
-  display.setTextAlignment(TEXT_ALIGN_LEFT);
-
-  Serial.begin(115200);
-  while (!Serial); //if just the the basic function, must connect to a computer
-  delay(1000);
-
-  display.drawString(5,5,"LoRa Receiver");
-  display.display();
-  SPI.begin(5,19,27,18);
-  LoRa.setPins(SS,RST,DI0);
+    SPI.begin(5,19,27,18);
+    LoRa.setPins(SS,RST,DI0);
 
 /*
   pinMode(vbatPin, INPUT);
@@ -70,64 +59,16 @@ void setup() {
   Serial.println("Vbat = "); Serial.print(VBAT); Serial.println(" Volts");
 */
 
-  if (!LoRa.begin(BAND, true)) {
-    display.drawString(5,25,"Starting LoRa failed!");
-    while (1);
-  }
-  Serial.println("LoRa Initial OK!");
-
-  Serial.print("LoRa Frequency: ");
-  Serial.println(BAND);
-
-  Serial.print("LoRa Spreading Factor: ");
-  Serial.println(spreadingFactor);
-  LoRa.setSpreadingFactor(spreadingFactor);
-
-  Serial.print("LoRa Signal Bandwidth: ");
-  Serial.println(SignalBandwidth);
-  LoRa.setSignalBandwidth(SignalBandwidth);
-
-  LoRa.setCodingRate4(codingRateDenominator);
-
-  display.drawString(5,25,"Startup completed ...");
-  display.display();
-
-  display.clear();
-  display.setFont(ArialMT_Plain_10);
-  snprintf(sbuf, 512, "Frequency: %u MHz", LoRa.getFrequency() / 1000000);
-  display.drawString(5, 0, sbuf);
-  display.display();
+    if (!LoRa.begin(BAND, true)) {
+        display.drawString(0,0,"FATAL: Unable to initialize LoRa");
+        display.display();
+        while (1);
+    }
+    LoRa.setSpreadingFactor(spreadingFactor);
+    LoRa.setSignalBandwidth(SignalBandwidth);
+    LoRa.setCodingRate4(codingRateDenominator);
 }
 
 void loop() {
-  display.clear();
-  display.drawString(5,25,"Sending packet ...");
 
-  // try to parse packet
-  int packetSize = LoRa.parsePacket();
-  if (packetSize) {
-    display.clear();
-    snprintf(sbuf, 512, "Frequency: %u MHz", LoRa.getFrequency() / 1000000);
-    display.drawString(5, 0, sbuf);
-    display.display();
-
-    // read packet
-    while (LoRa.available()) {
-      String data = LoRa.readString();
-      display.drawString(20,22, data);
-      display.display();
-    }
-
-    // print RSSI of packet
-    Serial.print(" with RSSI ");
-    Serial.println(LoRa.packetRssi());
-    Serial.print(" with SNR ");
-    Serial.println(LoRa.packetSnr());
-    // display.drawString(0, 45, "RSSI: ");
-    // display.drawString(50, 45, (String)LoRa.packetRssi());
-
-    display.drawString(0, 45, (String)LoRa.packetRssi() + "dB (" + (String)LoRa.packetSnr() +"dB)");
-
-    display.display();
-  }
 }

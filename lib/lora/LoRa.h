@@ -11,6 +11,12 @@
 #define PA_OUTPUT_PA_BOOST_PIN  1
 #define PA_OUTPUT_RFO_PIN       0
 
+#define LORA_STATUS_MODEM_CLR   (0x10)
+#define LORA_STATUS_HDR_VALID   (0x08)
+#define LORA_STATUS_CURR_RX     (0x04)
+#define LORA_STATUS_SIG_SYNC    (0x02)
+#define LORA_STATUS_SIG_DET     (0x01)
+
 #if defined (__STM32F1__)
 inline unsigned char  digitalPinToInterrupt(unsigned char Interrupt_pin) { return Interrupt_pin; } //This isn't included in the stm32duino libs (yet)
 #define portOutputRegister(port) (volatile byte *)( &(port->regs->ODR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
@@ -40,6 +46,8 @@ public:
   virtual int read();
   virtual int peek();
   virtual void flush();
+
+  int status();
 
   void onReceive(void(*callback)(int));
 
