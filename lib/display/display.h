@@ -3,6 +3,11 @@
 
 #include "SSD1306.h"
 
+//OLED pins to ESP32 GPIOs via this connection:
+//OLED_SDA — GPIO4
+//OLED_SCL — GPIO15
+//OLED_RST — GPIO16
+
 typedef struct aeronet_display_t {
     SSD1306*  display;
     uint32_t  ts_low;

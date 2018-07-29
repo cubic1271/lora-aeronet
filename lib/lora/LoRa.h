@@ -98,6 +98,7 @@ private:
 
 private:
   SPISettings _spiSettings;
+  bool _writing;
   int _ss;
   int _reset;
   int _dio0;

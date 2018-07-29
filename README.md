@@ -34,4 +34,5 @@ It looks like the reason this didn't work is because the parsePacket method, in
 this case, actually puts the radio into a packet receive mode if the radio isn't
 in that mode already ... but then immediately returns from the function.  Thus,
 it seems like parsePacket (as written) needs to be called twice in cases where
-we desire to transmit a packet, then immediately fall back into a receive mode.
+we desire to transmit a packet: the first will put the radio into receive mode,
+and the second will check to see if we've received a packet.
