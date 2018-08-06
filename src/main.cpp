@@ -5,6 +5,9 @@
 #include <LoRa.h>
 #include "stats.h"
 #include "display.h"
+
+#include "radio.h"
+#include "vt100.h"
 // #include "SSD1306.h"
 
 SSD1306 display(0x3c, 4, 15);
@@ -18,15 +21,15 @@ char sbuf[512];
 
 void setup() {
     SPI.begin(5,19,27,18);
-
+    aeronet_vt100_init(&Serial);
     aeronet_display_init(&display);
     aeronet_radio_init();
-    aeronet_vt100_init(&Serial);
 
     pinMode(vbatPin, INPUT);
     VBAT = (120.0/20.0) * (float)(analogRead(vbatPin)) / 1024.0; // LiPo battery voltage in volts
 }
 
 void loop() {
-
+    aeronet_display_update();
+    aeronet_vt100_update();
 }
