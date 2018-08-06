@@ -31,6 +31,16 @@ int aeronet_radio_init() {
     return 0;
 }
 
+aeronet_radio_t* aeronet_radio() {
+    return &_radio;
+}
+
+float aeronet_radio_datarate() {
+    return _radio.spreading
+            * (_radio.bandwidth / (float)(1 << _radio.spreading))
+            * (4.0 / (float)_radio.codingRateDenominator);
+}
+
 void aeronet_radio_update() {
 
 }

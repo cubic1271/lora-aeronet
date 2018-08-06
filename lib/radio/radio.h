@@ -6,7 +6,7 @@
 
 typedef enum aeronet_radio_mode_t {
     RADIO_MODE_LORA = 0,
-    RADIO_MODE_FSK = 1
+    RADIO_MODE_GFSK = 1
 } aeronet_radio_mode_t;
 
 typedef struct aeronet_radio_t {
@@ -23,10 +23,9 @@ typedef struct aeronet_radio_t {
     uint8_t   mode;
 } aeronet_radio_t;
 
+aeronet_radio_t* aeronet_radio();
 int aeronet_radio_init();
-
 void aeronet_radio_update();
-
 float aeronet_radio_datarate();
 
 #endif

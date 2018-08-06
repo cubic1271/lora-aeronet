@@ -1,4 +1,5 @@
 #include "display.h"
+#include "radio.h"
 
 static aeronet_display_t  _display_info;
 
@@ -31,11 +32,19 @@ void aeronet_display_init(SSD1306* display) {
 }
 
 void aeronet_display_update() {
+    SSD1306* display = _display_info.display;
+    char sbuf[64];
     uint32_t ts = micros();
     if(ts < _display_info.ts_low) {
         _display_info.ts_high ++;
         _display_info.ts_low = ts;
     }
 
+    snprintf(sbuf, 64, "%0.1f MHz, %0.1f bps",
+                        aeronet_radio()->center / 1000000.0f,
+                        aeronet_radio_datarate());
 
+    display->setFont(ArialMT_Plain_10);
+    display->drawString(0, 0, sbuf);
+    display->display();
 }

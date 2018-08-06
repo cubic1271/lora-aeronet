@@ -80,7 +80,7 @@ int aeronet_vt100_command(char* command) {
     while(_cmdtable[i].callback != NULL && !matched) {
         if(!strcmp(_cmdtable[i].command, base)) {
             if(_cmdtable[i].callback != NULL) {
-                aeronet_log(LOGLEVEL_INFO, "Calling command handler for: %s", base);
+                aeronet_log(LOGLEVEL_DEBUG, "Calling command handler for: %s", base);
                 _cmdtable[i].callback(argc, (const char**)cmd);
                 matched = 1;
             }
